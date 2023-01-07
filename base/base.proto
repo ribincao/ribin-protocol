@@ -7,4 +7,30 @@ message Test
   bytes body						= 2;
 };
 
+enum Client2ServerReqCmd
+{
+  E_CMD_INVALID = 0;
+  E_CMD_HEART_BEAT = 10;
+
+  E_CMD_ROOM_CREATE = 2000;
+  E_CMD_ROOM_JOIN = 2001;
+  E_CMD_ROOM_LEAVE = 2002;
+  E_CMD_ROOM_CHAT = 2003;
+}
+
+message Client2ServerReq
+{
+  Client2ServerReqCmd cmd = 1;
+  string seq = 2;
+  bytes body = 3;
+}
+
+message Server2ClientRsp
+{
+  string seq = 1;
+  int32 code = 2;
+  string msg = 3;
+  bytes body = 4;
+}
+
 // protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./base/base.proto
