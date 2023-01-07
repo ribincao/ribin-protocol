@@ -33,4 +33,20 @@ message Server2ClientRsp
   bytes body = 4;
 }
 
+enum Server2ClientBstType
+{
+  E_PUSH_TEST = 0;
+
+  E_PUSH_ROOM_CREATE = 200;
+  E_PUSH_ROOM_JOIN = 201;
+  E_PUSH_ROOM_LEAVE = 202;
+  E_PUSH_ROOM_CHAT = 203;
+}
+message Server2ClientBst
+{
+  Server2ClientBstType type = 1;
+  string seq = 2;
+  bytes body = 3;
+}
+
 // protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./base/base.proto
