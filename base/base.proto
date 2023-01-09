@@ -42,7 +42,7 @@ message Server2ClientRsp
   string seq = 1;
   int32 code = 2;
   string msg = 3;
-  bytes body = 4;
+  RspBody body = 4;
 }
 
 enum Server2ClientBstType
