@@ -7,10 +7,16 @@ message Test
   bytes body						= 2;
 };
 // Request
+enum MsgType
+{
+  E_MSGTYPE_INVALID = 0;
+  E_MSGTYPE_CHAT = 1;
+}
 message ReqBody
 {
   string roomId = 1;
   string playerId = 2;
+  MsgType msgType = 3;
 }
 
 enum Client2ServerReqCmd
@@ -31,10 +37,18 @@ message Client2ServerReq
 }
 
 // Response
+message RoomInfo
+{
+  string roomId = 1;
+  int32 maxPlayerCount = 2;
+  int32 currentPlayerCount = 3;
+}
+
 message RspBody
 {
   string roomId = 1;
   string playerId = 2;
+  RoomInfo roomInfo = 3;
 }
 
 message Server2ClientRsp
