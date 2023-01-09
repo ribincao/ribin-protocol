@@ -6,6 +6,12 @@ message Test
   string seq						= 1;
   bytes body						= 2;
 };
+// Request
+message ReqBody
+{
+  string roomId = 1;
+  string playerId = 2;
+}
 
 enum Client2ServerReqCmd
 {
@@ -22,7 +28,14 @@ message Client2ServerReq
 {
   Client2ServerReqCmd cmd = 1;
   string seq = 2;
-  bytes body = 3;
+  ReqBody body = 3;
+}
+
+// Response
+message RspBody
+{
+  string roomId = 1;
+  string playerId = 2;
 }
 
 message Server2ClientRsp
@@ -46,7 +59,7 @@ message Server2ClientBst
 {
   Server2ClientBstType type = 1;
   string seq = 2;
-  bytes body = 3;
+  RspBody body = 3;
 }
 
 // protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./base/base.proto
