@@ -60,6 +60,11 @@ message Server2ClientRsp
   RspBody body = 5;
 }
 
+message BstBody
+{
+  string fromPlayerId = 1;
+}
+
 enum Server2ClientBstType
 {
   E_PUSH_TEST = 0;
@@ -74,7 +79,7 @@ message Server2ClientBst
 {
   Server2ClientBstType type = 1;
   string seq = 2;
-  RspBody body = 3;
+  BstBody body = 3;
 }
 
 // protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./base/base.proto
