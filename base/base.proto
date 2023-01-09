@@ -20,7 +20,7 @@ enum Client2ServerReqCmd
 
   E_CMD_ROOM_ENTER = 2000;
   E_CMD_ROOM_LEAVE = 2001;
-  E_CMD_ROOM_CHAT = 2002;
+  E_CMD_ROOM_MESSAGE = 2002;
 }
 
 message Client2ServerReq
@@ -40,19 +40,19 @@ message RspBody
 message Server2ClientRsp
 {
   string seq = 1;
-  int32 code = 2;
-  string msg = 3;
-  RspBody body = 4;
+  Client2ServerReqCmd cmd = 2; 
+  int32 code = 3;
+  string msg = 4;
+  RspBody body = 5;
 }
 
 enum Server2ClientBstType
 {
   E_PUSH_TEST = 0;
 
-  E_PUSH_ROOM_CREATE = 200;
-  E_PUSH_ROOM_JOIN = 201;
-  E_PUSH_ROOM_LEAVE = 202;
-  E_PUSH_ROOM_CHAT = 203;
+  E_PUSH_ROOM_ENTER = 200;
+  E_PUSH_ROOM_LEAVE = 201;
+  E_PUSH_ROOM_MESSAGE = 202;
 }
 message Server2ClientBst
 {
