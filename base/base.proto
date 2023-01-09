@@ -67,6 +67,8 @@ enum Server2ClientBstType
   E_PUSH_ROOM_ENTER = 200;
   E_PUSH_ROOM_LEAVE = 201;
   E_PUSH_ROOM_MESSAGE = 202;
+
+  E_PUSH_ROOM_CONNECT = 203;
 }
 message Server2ClientBst
 {
