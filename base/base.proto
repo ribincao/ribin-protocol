@@ -16,7 +16,20 @@ message ReqBody
 {
   string roomId = 1;
   string playerId = 2;
-  MsgType msgType = 3;
+  EnterRoomReq enterRoomReq = 3;
+  LeaveRoomReq leaveRoomReq = 4;
+  RoomMessageReq roomMessageReq = 5;
+}
+
+message EnterRoomReq
+{}
+
+message LeaveRoomReq
+{}
+
+message RoomMessageReq
+{
+  MsgType msgType = 1;
 }
 
 enum Client2ServerReqCmd
@@ -44,11 +57,26 @@ message RoomInfo
   int32 currentPlayerCount = 3;
 }
 
+message EnterRoomRsp
+{
+  RoomInfo roomInfo = 1;
+}
+
+message LeaveRoomRsp
+{}
+
+message RoomMessageRsp
+{
+  MsgType msgType = 1;
+}
+
 message RspBody
 {
   string roomId = 1;
   string playerId = 2;
-  RoomInfo roomInfo = 3;
+  EnterRoomRsp  enterRoomRsp = 3;
+  LeaveRoomRsp leaveRoomRsp = 4;
+  RoomMessageRsp roomMessageRsp = 5;
 }
 
 message Server2ClientRsp
@@ -60,6 +88,8 @@ message Server2ClientRsp
   RspBody body = 5;
 }
 
+
+// Broadcast
 message BstBody
 {
   string fromPlayerId = 1;
