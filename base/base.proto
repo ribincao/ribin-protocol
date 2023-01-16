@@ -19,6 +19,19 @@ message ReqBody
   EnterRoomReq enterRoomReq = 3;
   LeaveRoomReq leaveRoomReq = 4;
   RoomMessageReq roomMessageReq = 5;
+  Frame sendframeReq = 6;
+}
+
+message Position
+{
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Frame
+{
+  Position position = 1;
 }
 
 message EnterRoomReq
@@ -40,6 +53,7 @@ enum Client2ServerReqCmd
   E_CMD_ROOM_ENTER = 2000;
   E_CMD_ROOM_LEAVE = 2001;
   E_CMD_ROOM_MESSAGE = 2002;
+  E_CMD_ROOM_FRAME = 2003;
 }
 
 message Client2ServerReq
@@ -90,9 +104,15 @@ message Server2ClientRsp
 
 
 // Broadcast
+message Frames
+{
+  repeated Frame frames = 1;
+}
+
 message BstBody
 {
   string fromPlayerId = 1;
+  Frames frmaes = 2;
 }
 
 enum Server2ClientBstType
@@ -102,8 +122,8 @@ enum Server2ClientBstType
   E_PUSH_ROOM_ENTER = 200;
   E_PUSH_ROOM_LEAVE = 201;
   E_PUSH_ROOM_MESSAGE = 202;
-
   E_PUSH_ROOM_CONNECT = 203;
+  E_PUSH_ROOM_FRAMES = 204;
 }
 message Server2ClientBst
 {
