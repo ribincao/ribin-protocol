@@ -112,7 +112,7 @@ message Frames
 message BstBody
 {
   string fromPlayerId = 1;
-  Frames frmaes = 2;
+  Frames frames = 2;
 }
 
 enum Server2ClientBstType
