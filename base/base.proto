@@ -31,7 +31,8 @@ message Position
 
 message Frame
 {
-  Position position = 1;
+  string playerId = 1;
+  Position position = 2;
 }
 
 message EnterRoomReq
