@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+
+message RpcAddReq{
+  int64 num1 = 1;
+  int64 num2 = 2;
+}
+message RpcAddRsp{
+  int64 result = 1;
+}
+
+
+
+// protoc -I=./protos --python_out=./message ./protos/rpc_message.proto
+
+// Test:
+// ./protos/protoc-test -I=./protos --python_out=./message ./protos/rpc_message.proto

@@ -1,0 +1,159 @@
+syntax = "proto3";
+
+enum Client2ServerReqCmd
+{
+  E_CMD_INVALID = 0;
+  E_CMD_HEART_BEAT = 10;
+  E_CMD_BROAD_CAST = 20;
+
+  E_CMD_ROOM_ENTER = 10000;
+  E_CMD_ROOM_LEAVE = 10001;
+
+  E_CMD_HALL_CHAT = 20000;
+  E_CMD_HALL_ACTIVITY = 20001;
+
+  E_CMD_TABLE_CREATE = 30000;
+  E_CMD_TABLE_JOIN = 30001;
+  E_CMD_TABLE_LEAVE = 30002;
+  E_CMD_TABLE_MESSAGE = 30003;
+
+  E_CMD_RPC = 2000;
+}
+
+message Client2Server
+{
+  Client2ServerReqCmd cmd = 1;
+  string uid = 2;
+  string seq = 3;
+  bytes body = 4;
+}
+message Server2Client
+{
+  Client2ServerReqCmd cmd = 1;
+  string uid = 2;
+  string seq = 3;
+  int64 timestamp = 4;
+  bytes body = 5;
+  int32 code = 6;
+  string msg = 7;
+}
+
+// REQUEST-RESPONSE
+message HeartBeatReq
+{
+  string msg = 1;
+}
+message HeartBeatRsp
+{
+  string msg = 1;
+}
+
+message EnterRoomReq
+{
+  string from_id = 1;
+}
+message EnterRoomRsp
+{
+  RoomInfo room_info = 1;
+}
+
+message LeaveRoomReq
+{
+  string reason = 1;
+}
+message LeaveRoomRsp
+{
+  string msg = 1;
+}
+
+message CreateTableReq
+{
+  int32 game_id = 1;
+  string password = 2;
+}
+message CreateTableRsp
+{
+  int32 table_id = 1;
+}
+
+message JoinTableReq
+{
+  int32 table_id = 1;
+}
+message JoinTableRsp
+{
+  TableInfo table_info = 1;
+}
+
+message LeaveTableReq
+{
+  int32 table_id = 1;
+}
+message LeaveTableRsp
+{
+}
+
+
+// INFORMATION
+message RoomInfo
+{
+  int32 room_id = 1;
+  repeated TableInfo tables_info = 2;
+  repeated PlayerInfo players_info = 3;
+}
+
+message TableInfo
+{
+  int32 table_id = 1;
+}
+
+message PlayerInfo
+{
+  string uid = 1;
+}
+// INFORMATION
+
+
+enum TableOpType
+{
+  E_CMD_TABLE_OP_VALID = 0;
+  E_CMD_TABLE_CHAT = 1;
+  E_CMD_TABLE_OP_READY = 2;
+  E_CMD_TABLE_INIT = 3;
+  E_CMD_TABLE_OP_PASS = 4;
+  E_CMD_TABLE_OP_DROP = 5;
+}
+
+message TableMessageReq
+{
+  int32 table_id = 1;
+  TableOpType op = 2;
+  repeated int32 cards = 3;
+}
+message TableMessageRsp
+{
+  int32 table_id = 1;
+  int32 result = 2;
+}
+
+
+// BROADCAST
+enum BroadCastType
+{
+  E_BS_TYPE_SYSTEM = 0;
+  E_BS_TYPE_CHAT = 1;
+}
+message BroadCastMsg
+{
+  BroadCastType bst_type = 1;
+  string from_uid = 2;
+  string title = 3;
+  string message = 4;
+  string time = 5;
+}
+
+
+// protoc -I=./protos --python_out=./message ./protos/message.proto
+
+// Test:
+// ./protos/protoc-test -I=./protos --python_out=./message ./protos/message.proto
