@@ -1,1 +1,2 @@
 # ribin-protocol
+后面所有公开项目用到的protocol放这里统一维护,bin目录里有protoc文件
