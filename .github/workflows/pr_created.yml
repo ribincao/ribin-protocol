@@ -1,10 +1,10 @@
-name: get pull request info for feishu
+name: get pull request info for lark
 
 on:
   pull_request:
     types: [opened, reopened]
 jobs:
-  feishu-pr:
+  lark-pr:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

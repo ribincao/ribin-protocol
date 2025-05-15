@@ -45,7 +45,7 @@ class PrNotification:
         """
         if pr_type == "created":
             self.content.append(self.get_at_list(reviewers))
-        feishu = fsbot.LarkMessageBot(self.webhook, secret=self.secret)
+        feishu = fsbot.FeishuMessageBot(self.webhook, secret=self.secret)
         rich_text = self.create_rich_text(self.event_name, self.content)
         feishu.post(rich_text)
 
