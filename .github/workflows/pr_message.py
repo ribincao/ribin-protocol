@@ -16,6 +16,12 @@ backend_email_dic = {
     "ribincao": "ribin@kuse.ai",
     "austinxu123": "x@kuse.ai",
 }
+pr_color_dict = {"created": "yellow", "reviewed": "blue", "merged": "green"}
+pr_event_dict = {
+    "created": "KUSE-Backend (global) Pull Request 🚀 ",
+    "reviewed": "KUSE-Backend (global) Request Approved ✅ ",
+    "merged": "KUSE-Backend (global) Pull Request Merged 👏 ",
+}
 
 
 class PrNotification:
@@ -29,28 +35,24 @@ class PrNotification:
 
         self.webhook = "https://open.larksuite.com/open-apis/bot/v2/hook/32bcd6a0-db67-456f-8f9c-525e4c3cc3aa"
         self.secret = ""
-        if pr_type == "reviewed":
-            self.event_name = "KUSE-Backend (global) Request Approved ✅ "
-            self.content = self.pr_reviewed_content(pr_title, pr_user, pr_url)
-        elif pr_type == "created":
-            self.event_name = "KUSE-Backend (global) Pull Request 🚀 "
-            self.content = self.pr_create_content(pr_title, pr_user, pr_url)
-        elif pr_type == "merged":
-            self.event_name = "KUSE-Backend (global) Pull Request Merged 👏 "
-            self.content = self.pr_merged_content(pr_title, pr_user, pr_url)
+        self.pr_type = pr_type
+
+        self.color = pr_color_dict.get(self.pr_type, "red")
+        self.event_name = pr_event_dict.get(self.pr_type, "")
+        self.at_users = self.get_at_list(reviewers)
+        self.pr_user = backend_email_dic.get(pr_user, "")
+        self.pr_title = pr_title
+        self.pr_url = pr_url
+        self.meger_user = merge_user
 
     def send_message(self):
         """
         发送消息
         """
-        reviewers_content = self.get_at_list(reviewers)
-        if pr_type == "created" and reviewers_content:
-            self.content.append(reviewers_content)
         feishu = fsbot.FeiShuMessageBot(self.webhook, secret=self.secret)
-        rich_text = self.create_rich_text(self.event_name, self.content)
-        feishu.post(rich_text)
+        feishu.post(self.create_rich_text())
 
-    def get_at_list(self, reviewers: str):
+    def get_at_list(self, reviewers: str) -> str:
         """
         生成@用户富文本
         :param reviewers: pull request中要求reivew的人
@@ -58,114 +60,83 @@ class PrNotification:
         reviewers_list = json.loads(reviewers)
         if not reviewers_list:
             return ""
-        text = "reviewers: "
+        text = ""
         for reviewer in reviewers_list:
             email = backend_email_dic.get(reviewer, "")
             if not email:
                 continue
             text += f"<at email={email}></at>"
-        at_lsit = [
-            {"tag": "text", "text": text},
-        ]
-        return at_lsit
+        return text
 
-    def pr_create_content(self, desc: str, user: str, url: str):
+    def create_rich_text(self):
         """
-        初始化PR创建富文本内容
-        :param desc: PR描述
-        :param user: 发起user的人
-        """
-        content = [
-            [
-                {"tag": "lark_md", "text": "Desc：" + desc},
-            ],
-            [],
-            [
-                {
-                    "tag": "lark_md",
-                    "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
-                },
-            ],
-            [],
-            [
-                {"tag": "lark_md", "text": f"PR Link：{url}"},
-            ],
-            [],
-        ]
-        return content
-
-    def pr_reviewed_content(self, desc: str, user: str, url: str):
-        """
-        初始化PR完成代码审查富文本内容
-        :param desc: PR描述
-        :param user: 发起user的人
-        """
-        content = [
-            [
-                {"tag": "lark_md", "text": "Desc：" + desc},
-            ],
-            [],
-            [
-                {
-                    "tag": "lark_md",
-                    "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
-                },
-            ],
-            [],
-            [
-                {"tag": "lark_md", "text": f"PR Link：{url}"},
-            ],
-            [],
-            [
-                {
-                    "tag": "lark_md",
-                    "text": f"reviewer：<at email={backend_email_dic.get(review_user, '')}</at>",
-                },
-            ],
-        ]
-        return content
-
-    def create_rich_text(self, title: str, content: str):
-        """
-        创建富文本
+        创建富文本卡片
         :param title: 标题
         :param content: 富文本内容
         """
         rich_text = {
-            "msg_type": "post",
-            "content": {"post": {"zh_cn": {"title": title, "content": content}}},
-        }
-        return rich_text
-
-    def pr_merged_content(self, desc: str, user: str, url: str):
-        """
-        初始化PR完成代码审查富文本内容
-        :param desc: PR描述
-        :param user: 发起user的人
-        """
-
-        email = backend_email_dic.get(user, "")
-        content = [
-            [
-                {"tag": "lark_md", "text": "Desc：" + desc},
-            ],
-            [],
-            [
-                {"tag": "lark_md", "text": f"Request： <at email={email}></at>"},
-            ],
-            [],
-            [
-                {"tag": "lark_md", "text": f"PR Link：{url}"},
-            ],
-            [],
-            [
+            "msg_type": "interactive",
+            "card": {
+                "config": {
+                    "wide_screen_mode": True,
+                }
+            },
+            "header": {
+                "template": self.color,
+                "title": {"content": self.event_name, "tag": "plain_text"},
+            },
+            "elements": [
                 {
-                    "tag": "lark_md",
-                    "text": f"merge：<at email={backend_email_dic.get(merge_user, '')}</at>",
-                },
+                    "fields": [
+                        {
+                            "is_short": True,
+                            "text": {
+                                "content": f"**🔢 Request：**{self.pr_user}",
+                                "tag": "lark_md",
+                            },
+                        },
+                        {
+                            "is_short": True,
+                            "text": {
+                                "content": f"**👤 Title：**{self.pr_title}",
+                                "tag": "lark_md",
+                            },
+                        },
+                        {"is_short": False, "text": {"content": "", "tag": "lark_md"}},
+                        {
+                            "is_short": True,
+                            "text": {
+                                "content": f"**🔎 Link：**{self.pr_url} </at>",
+                                "tag": "lark_md",
+                            },
+                        },
+                    ],
+                    "tag": "div",
+                }
             ],
-        ]
-        return content
+        }
+        if self.pr_type == "merged":
+            rich_text["elements"][0]["fields"].append(
+                {
+                    "is_short": True,
+                    "text": {
+                        "content": f"**👤 Merge：**{backend_email_dic.get(self.merge_user, '')}",
+                        "tag": "lark_md",
+                    },
+                }
+            )
+        if self.at_users:
+            rich_text["elements"][0]["fields"].append(
+                {
+                    "is_short": True,
+                    "text": {
+                        "content": f"**👤 Reviewers：**{self.at_users}",
+                        "tag": "lark_md",
+                    },
+                }
+            )
+
+        return rich_text
 
 
 if __name__ == "__main__":
