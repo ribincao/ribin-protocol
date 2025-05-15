@@ -111,7 +111,7 @@ class PrNotification:
                             {
                                 "is_short": True,
                                 "text": {
-                                    "content": f"**🔢 Description：**{self.pr_title}",
+                                    "content": f"**🔢 Desc：**{self.pr_title}",
                                     "tag": "lark_md",
                                 },
                             },
