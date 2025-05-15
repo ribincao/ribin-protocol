@@ -10,10 +10,6 @@ reviewers = os.environ.get("reviewers", "[]")  # type: ignore
 review_user = os.environ.get("review_user", "")
 merge_user = os.environ.get("merge_user", "")
 
-commit_message = os.environ.get("commit_message", "")
-commit_user = os.environ.get("commit_user", "")
-commit_url = os.environ.get("commit_url", "")
-
 backend_email_dic = {
     "MarcoQin": "qinyuanyuan@kuse.ai",
     "sfzman": "fangzhou@kuse.ai",
@@ -49,15 +45,15 @@ class PrNotification:
 
         self.color = pr_color_dict.get(self.pr_type, "red")
         self.event_name = pr_event_dict.get(self.pr_type, "")
-        self.at_users = self.get_at_list(reviewers)
+        self.at_users = (
+            self.get_all_list()
+            if self.pr_type == "push"
+            else self.get_at_list(reviewers)
+        )
         self.pr_user = backend_email_dic.get(pr_user, "")
         self.pr_title = pr_title
         self.pr_url = pr_url
         self.merge_user = merge_user
-
-        self.commit_user = commit_user
-        self.commit_message = commit_message
-        self.commit_url = commit_url
 
     def send_message(self):
         """
@@ -65,6 +61,15 @@ class PrNotification:
         """
         feishu = fsbot.FeiShuMessageBot(self.webhook, secret=self.secret)
         feishu.post(self.create_rich_text())
+
+    def get_all_list(self) -> str:
+        """
+        获取所有通知用户
+        """
+        text = ""
+        for _, email in backend_email_dic.items():
+            text += f"<at email={email}></at>"
+        return text
 
     def get_at_list(self, reviewers: str) -> str:
         """
@@ -128,16 +133,6 @@ class PrNotification:
                 ],
             },
         }
-        if self.pr_type == "merged":
-            rich_text["card"]["elements"][0]["fields"].append(
-                {
-                    "is_short": True,
-                    "text": {
-                        "content": f"**👏 Merged：**<at email={backend_email_dic.get(self.merge_user, '')}></at>",
-                        "tag": "lark_md",
-                    },
-                }
-            )
         if self.at_users:
             rich_text["card"]["elements"][0]["fields"].append(
                 {
@@ -148,8 +143,17 @@ class PrNotification:
                     },
                 }
             )
+        if self.pr_type == "merged":
+            rich_text["card"]["elements"][0]["fields"].append(
+                {
+                    "is_short": True,
+                    "text": {
+                        "content": f"**👏 Merged：**<at email={backend_email_dic.get(self.merge_user, '')}></at>",
+                        "tag": "lark_md",
+                    },
+                }
+            )
 
-        print(rich_text)
         return rich_text
 
 

@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  notify-main-push:
+  main-push-notify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -23,9 +23,9 @@ jobs:
 
       - name: set commit info
         run: |
-          echo commit_message=$(git log -1 --pretty=format:"%s") >> $GITHUB_ENV
-          echo commit_url=https://github.com/${{ github.repository }}/commit/${{ github.sha }} >> $GITHUB_ENV
-          echo commit_user=${{ github.actor }} >> $GITHUB_ENV
+          echo pr_title=$(git log -1 --pretty=format:"%s") >> $GITHUB_ENV
+          echo pr_url=https://github.com/${{ github.repository }}/commit/${{ github.sha }} >> $GITHUB_ENV
+          echo pr_user=${{ github.actor }} >> $GITHUB_ENV
           echo pr_type="push" >> $GITHUB_ENV
 
       - name: call lark webhook
