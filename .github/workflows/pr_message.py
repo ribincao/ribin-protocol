@@ -2,13 +2,17 @@ import fsbot
 import json
 import os
 
-pr_title = os.environ.get("pr_title", "test_title")
-pr_url = os.environ.get("pr_url", "http://www.baidu.com")
-pr_user = os.environ.get("pr_user", "ribincao")
-pr_type = os.environ.get("pr_type", "merged")
+pr_title = os.environ.get("pr_title", "")
+pr_url = os.environ.get("pr_url", "")
+pr_user = os.environ.get("pr_user", "")
+pr_type = os.environ.get("pr_type", "")
 reviewers = os.environ.get("reviewers", "[]")  # type: ignore
 review_user = os.environ.get("review_user", "")
-merge_user = os.environ.get("merge_user", "ribincao")
+merge_user = os.environ.get("merge_user", "")
+
+commit_message = os.environ.get("commit_message", "")
+commit_user = os.environ.get("commit_user", "")
+commit_url = os.environ.get("commit_url", "")
 
 backend_email_dic = {
     "MarcoQin": "qinyuanyuan@kuse.ai",
@@ -18,9 +22,10 @@ backend_email_dic = {
 }
 pr_color_dict = {"created": "yellow", "reviewed": "blue", "merged": "green"}
 pr_event_dict = {
-    "created": "KUSE-Backend (global) Pull Request 🚀 ",
-    "reviewed": "KUSE-Backend (global) Request Approved ✅ ",
-    "merged": "KUSE-Backend (global) Pull Request Merged 👏 ",
+    "created": "KUSE-Backend (kuse_ai) Pull Request 👀 ",
+    "reviewed": "KUSE-Backend (kuse_ai) Request Approved ✅ ",
+    "merged": "KUSE-Backend (kuse_ai) Pull Request Merged 👏 ",
+    "push": "KUSE-Backend (kuse_ai) Main Pushed 🚀 ",
 }
 
 
@@ -44,6 +49,10 @@ class PrNotification:
         self.pr_title = pr_title
         self.pr_url = pr_url
         self.merge_user = merge_user
+
+        self.commit_user = commit_user
+        self.commit_message = commit_message
+        self.commit_url = commit_url
 
     def send_message(self):
         """
@@ -90,21 +99,21 @@ class PrNotification:
                             {
                                 "is_short": True,
                                 "text": {
-                                    "content": f"**👤 PR-User：**<at email={self.pr_user}></at>",
+                                    "content": f"**👤 User：**<at email={self.pr_user}></at>",
                                     "tag": "lark_md",
                                 },
                             },
                             {
                                 "is_short": True,
                                 "text": {
-                                    "content": f"**🔢 PR-Title：**{self.pr_title}",
+                                    "content": f"**🔢 Description：**{self.pr_title}",
                                     "tag": "lark_md",
                                 },
                             },
                             {
                                 "is_short": True,
                                 "text": {
-                                    "content": f"**🔎 PR-Link：**{self.pr_url} </at>",
+                                    "content": f"**🔎 Link：**{self.pr_url} </at>",
                                     "tag": "lark_md",
                                 },
                             },
@@ -119,18 +128,17 @@ class PrNotification:
                 {
                     "is_short": True,
                     "text": {
-                        "content": f"**👤 Merged：**<at email={backend_email_dic.get(self.merge_user, '')}></at>",
+                        "content": f"**👏 Merged：**<at email={backend_email_dic.get(self.merge_user, '')}></at>",
                         "tag": "lark_md",
                     },
                 }
             )
-        self.at_users = "<at email=ribin@kuse.ai></at><at email=ribin@kuse.ai></at>"
         if self.at_users:
             rich_text["card"]["elements"][0]["fields"].append(
                 {
                     "is_short": True,
                     "text": {
-                        "content": f"**👤 Reviewers：**{self.at_users}",
+                        "content": f"**💪 Reviewers：**{self.at_users}",
                         "tag": "lark_md",
                     },
                 }
