@@ -43,9 +43,9 @@ class PrNotification:
         """
         发送消息
         """
-        reviewers = self.get_at_list(reviewers)
-        if pr_type == "created" and reviewers:
-            self.content.append(reviewers)
+        reviewers_content = self.get_at_list(reviewers)
+        if pr_type == "created" and reviewers_content:
+            self.content.append(reviewers_content)
         feishu = fsbot.FeiShuMessageBot(self.webhook, secret=self.secret)
         rich_text = self.create_rich_text(self.event_name, self.content)
         feishu.post(rich_text)
