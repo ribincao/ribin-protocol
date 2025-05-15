@@ -55,10 +55,10 @@ class PrNotification:
         生成@用户富文本
         :param reviewers: pull request中要求reivew的人
         """
-        if not reviewers:
-            return None
-        text = "reviewers: "
         reviewers_list = json.loads(reviewers)
+        if not reviewers_list:
+            return ""
+        text = "reviewers: "
         for reviewer in reviewers_list:
             email = backend_email_dic.get(reviewer, "")
             if not email:
@@ -77,18 +77,18 @@ class PrNotification:
         """
         content = [
             [
-                {"tag": "text", "text": "Desc：" + desc},
+                {"tag": "lark_md", "text": "Desc：" + desc},
             ],
             [],
             [
                 {
-                    "tag": "text",
+                    "tag": "lark_md",
                     "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
                 },
             ],
             [],
             [
-                {"tag": "text", "text": f"PR Link：{url}"},
+                {"tag": "lark_md", "text": f"PR Link：{url}"},
             ],
             [],
         ]
@@ -102,23 +102,23 @@ class PrNotification:
         """
         content = [
             [
-                {"tag": "text", "text": "Desc：" + desc},
+                {"tag": "lark_md", "text": "Desc：" + desc},
             ],
             [],
             [
                 {
-                    "tag": "text",
+                    "tag": "lark_md",
                     "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
                 },
             ],
             [],
             [
-                {"tag": "text", "text": f"PR Link：{url}"},
+                {"tag": "lark_md", "text": f"PR Link：{url}"},
             ],
             [],
             [
                 {
-                    "tag": "text",
+                    "tag": "lark_md",
                     "text": f"reviewer：<at email={backend_email_dic.get(review_user, '')}</at>",
                 },
             ],
@@ -147,20 +147,20 @@ class PrNotification:
         email = backend_email_dic.get(user, "")
         content = [
             [
-                {"tag": "text", "text": "Desc：" + desc},
+                {"tag": "lark_md", "text": "Desc：" + desc},
             ],
             [],
             [
-                {"tag": "text", "text": f"Request： <at email={email}></at>"},
+                {"tag": "lark_md", "text": f"Request： <at email={email}></at>"},
             ],
             [],
             [
-                {"tag": "text", "text": f"PR Link：{url}"},
+                {"tag": "lark_md", "text": f"PR Link：{url}"},
             ],
             [],
             [
                 {
-                    "tag": "text",
+                    "tag": "lark_md",
                     "text": f"merge：<at email={backend_email_dic.get(merge_user, '')}</at>",
                 },
             ],
