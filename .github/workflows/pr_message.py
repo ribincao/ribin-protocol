@@ -2,13 +2,13 @@ import fsbot
 import json
 import os
 
-pr_title = os.environ.get("pr_title", "")
-pr_url = os.environ.get("pr_url", "")
-pr_user = os.environ.get("pr_user", "")
-pr_type = os.environ.get("pr_type", "")
-reviewers = os.environ.get("reviewers", [])  # type: ignore
+pr_title = os.environ.get("pr_title", "test_title")
+pr_url = os.environ.get("pr_url", "http://www.baidu.com")
+pr_user = os.environ.get("pr_user", "ribincao")
+pr_type = os.environ.get("pr_type", "merged")
+reviewers = os.environ.get("reviewers", "[]")  # type: ignore
 review_user = os.environ.get("review_user", "")
-merge_user = os.environ.get("merge_user", "")
+merge_user = os.environ.get("merge_user", "ribincao")
 
 backend_email_dic = {
     "MarcoQin": "qinyuanyuan@kuse.ai",
@@ -43,7 +43,7 @@ class PrNotification:
         self.pr_user = backend_email_dic.get(pr_user, "")
         self.pr_title = pr_title
         self.pr_url = pr_url
-        self.meger_user = merge_user
+        self.merge_user = merge_user
 
     def send_message(self):
         """
@@ -79,54 +79,54 @@ class PrNotification:
             "card": {
                 "config": {
                     "wide_screen_mode": True,
-                }
+                },
+                "header": {
+                    "template": self.color,
+                    "title": {"content": self.event_name, "tag": "plain_text"},
+                },
+                "elements": [
+                    {
+                        "fields": [
+                            {
+                                "is_short": True,
+                                "text": {
+                                    "content": f"**👤 PR-User：**<at email={self.pr_user}></at>",
+                                    "tag": "lark_md",
+                                },
+                            },
+                            {
+                                "is_short": True,
+                                "text": {
+                                    "content": f"**🔢 PR-Title：**{self.pr_title}",
+                                    "tag": "lark_md",
+                                },
+                            },
+                            {
+                                "is_short": True,
+                                "text": {
+                                    "content": f"**🔎 PR-Link：**{self.pr_url} </at>",
+                                    "tag": "lark_md",
+                                },
+                            },
+                        ],
+                        "tag": "div",
+                    }
+                ],
             },
-            "header": {
-                "template": self.color,
-                "title": {"content": self.event_name, "tag": "plain_text"},
-            },
-            "elements": [
-                {
-                    "fields": [
-                        {
-                            "is_short": True,
-                            "text": {
-                                "content": f"**🔢 Request：**{self.pr_user}",
-                                "tag": "lark_md",
-                            },
-                        },
-                        {
-                            "is_short": True,
-                            "text": {
-                                "content": f"**👤 Title：**{self.pr_title}",
-                                "tag": "lark_md",
-                            },
-                        },
-                        {"is_short": False, "text": {"content": "", "tag": "lark_md"}},
-                        {
-                            "is_short": True,
-                            "text": {
-                                "content": f"**🔎 Link：**{self.pr_url} </at>",
-                                "tag": "lark_md",
-                            },
-                        },
-                    ],
-                    "tag": "div",
-                }
-            ],
         }
         if self.pr_type == "merged":
-            rich_text["elements"][0]["fields"].append(
+            rich_text["card"]["elements"][0]["fields"].append(
                 {
                     "is_short": True,
                     "text": {
-                        "content": f"**👤 Merge：**{backend_email_dic.get(self.merge_user, '')}",
+                        "content": f"**👤 Merged：**<at email={backend_email_dic.get(self.merge_user, '')}></at>",
                         "tag": "lark_md",
                     },
                 }
             )
+        self.at_users = "<at email=ribin@kuse.ai></at><at email=ribin@kuse.ai></at>"
         if self.at_users:
-            rich_text["elements"][0]["fields"].append(
+            rich_text["card"]["elements"][0]["fields"].append(
                 {
                     "is_short": True,
                     "text": {
@@ -136,6 +136,7 @@ class PrNotification:
                 }
             )
 
+        print(rich_text)
         return rich_text
 
 
