@@ -43,8 +43,9 @@ class PrNotification:
         """
         发送消息
         """
-        if pr_type == "created":
-            self.content.append(self.get_at_list(reviewers))
+        reviewers = self.get_at_list(reviewers)
+        if pr_type == "created" and reviewers:
+            self.content.append(reviewers)
         feishu = fsbot.FeiShuMessageBot(self.webhook, secret=self.secret)
         rich_text = self.create_rich_text(self.event_name, self.content)
         feishu.post(rich_text)
@@ -54,13 +55,15 @@ class PrNotification:
         生成@用户富文本
         :param reviewers: pull request中要求reivew的人
         """
+        if not reviewers:
+            return None
         text = "reviewers: "
         reviewers_list = json.loads(reviewers)
         for reviewer in reviewers_list:
             email = backend_email_dic.get(reviewer, "")
             if not email:
                 continue
-            text += f"<at email={email}>"
+            text += f"<at email={email}></at>"
         at_lsit = [
             {"tag": "text", "text": text},
         ]
@@ -78,7 +81,10 @@ class PrNotification:
             ],
             [],
             [
-                {"tag": "text", "text": f"Request：{backend_email_dic.get(user, '')}"},
+                {
+                    "tag": "text",
+                    "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
+                },
             ],
             [],
             [
@@ -100,7 +106,10 @@ class PrNotification:
             ],
             [],
             [
-                {"tag": "text", "text": f"Request：{backend_email_dic.get(user, '')}"},
+                {
+                    "tag": "text",
+                    "text": f"Request：<at email={backend_email_dic.get(user, '')}></at>",
+                },
             ],
             [],
             [
@@ -110,7 +119,7 @@ class PrNotification:
             [
                 {
                     "tag": "text",
-                    "text": f"reviewer：<at email={backend_email_dic.get(review_user, '')}>",
+                    "text": f"reviewer：<at email={backend_email_dic.get(review_user, '')}</at>",
                 },
             ],
         ]
@@ -142,7 +151,7 @@ class PrNotification:
             ],
             [],
             [
-                {"tag": "text", "text": f"Request： <at email={email}>"},
+                {"tag": "text", "text": f"Request： <at email={email}></at>"},
             ],
             [],
             [
@@ -152,7 +161,7 @@ class PrNotification:
             [
                 {
                     "tag": "text",
-                    "text": f"merge：<at email={backend_email_dic.get(merge_user, '')}>",
+                    "text": f"merge：<at email={backend_email_dic.get(merge_user, '')}</at>",
                 },
             ],
         ]
