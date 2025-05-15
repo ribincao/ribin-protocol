@@ -20,7 +20,12 @@ backend_email_dic = {
     "ribincao": "ribin@kuse.ai",
     "austinxu123": "x@kuse.ai",
 }
-pr_color_dict = {"created": "yellow", "reviewed": "blue", "merged": "green"}
+pr_color_dict = {
+    "created": "yellow",
+    "reviewed": "blue",
+    "merged": "green",
+    "push": "red",
+}
 pr_event_dict = {
     "created": "KUSE-Backend (kuse_ai) Pull Request 👀 ",
     "reviewed": "KUSE-Backend (kuse_ai) Request Approved ✅ ",
