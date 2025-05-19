@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "当前 commit: ${{ github.sha }}"
           previous_sha=$(gh api \
-            repos/${{ github.repository }}/actions/workflows/deploy.yml/runs \
+            repos/${{ github.repository }}/actions/workflows/deploy-to-prd.yml/runs \
             --paginate \
             -q '.workflow_runs[] | select(.event == "workflow_dispatch" and .status == "completed" and .conclusion == "success" and .head_branch == "main") | .head_sha' \
             | grep -v "${{ github.sha }}" \
