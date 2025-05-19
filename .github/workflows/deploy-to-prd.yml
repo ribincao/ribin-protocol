@@ -23,6 +23,28 @@ jobs:
           python -m pip install requests
           python -m pip install fsbot
 
+      - name: get previous commit SHA from tag
+        id: get_prev
+        run: |
+          git fetch --tags
+          prev_commit=$(git rev-list -n 1 last-prod-deploy || echo "")
+          echo "PREV_COMMIT_SHA=$prev_commit" >> $GITHUB_ENV
+
+      - name: get current commit SHA
+        id: get_curr
+        run: |
+          echo "CURRENT_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: get commit diff
+        id: diff
+        run: |
+          if [ -n "$PREV_COMMIT_SHA" ]; then
+            echo "Getting commits between $PREV_COMMIT_SHA and $CURRENT_COMMIT_SHA"
+            git log --pretty=format:"- %s (%an)" $PREV_COMMIT_SHA..$CURRENT_COMMIT_SHA > commit_diff.txt
+          else
+            echo "First deployment or tag missing." > commit_diff.txt
+          fi
+
       - name: set commit info
         run: |
           echo pr_title="deploy to prod" >> $GITHUB_ENV

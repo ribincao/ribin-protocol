@@ -10,11 +10,19 @@ reviewers = os.environ.get("reviewers", "[]")  # type: ignore
 review_user = os.environ.get("review_user", "")
 merge_user = os.environ.get("merge_user", "")
 
+
+def get_title() -> str:
+    pr_title = os.environ.get("pr_title", "")
+    if pr_title:
+        return pr_title
+
+    with open("commit_diff.txt", "r") as f:
+        commit_log = f.read()
+    return commit_log
+
+
 backend_email_dic = {
-    "MarcoQin": "qinyuanyuan@kuse.ai",
-    "sfzman": "fangzhou@kuse.ai",
     "ribincao": "ribin@kuse.ai",
-    "austinxu123": "x@kuse.ai",
 }
 pr_color_dict = {
     "created": "yellow",
@@ -51,7 +59,7 @@ class PrNotification:
             else self.get_at_list(reviewers)
         )
         self.pr_user = backend_email_dic.get(pr_user, "")
-        self.pr_title = pr_title
+        self.pr_title = get_title()
         self.pr_url = pr_url
         self.merge_user = merge_user
 
