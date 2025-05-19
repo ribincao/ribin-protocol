@@ -1,0 +1,35 @@
+name: Deploy to prd
+
+on:
+  workflow_dispatch:
+    inputs:
+      commitSHA:
+        description: "Optional Commit SHA for deployment"
+        required: false
+
+jobs:
+  deploy-to-prod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v4
+
+      - name: install dependencies
+        run: |
+          python -m pip install requests
+          python -m pip install fsbot
+
+      - name: set commit info
+        run: |
+          echo pr_title="deploy to prod" >> $GITHUB_ENV
+          echo pr_url="url" >> $GITHUB_ENV
+          echo pr_user=${{ github.actor }} >> $GITHUB_ENV
+          echo pr_type="push" >> $GITHUB_ENV
+
+      - name: call lark webhook
+        run: |
+          python .github/workflows/pr_message.py
