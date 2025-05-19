@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: setup python
         uses: actions/setup-python@v4
@@ -23,26 +25,31 @@ jobs:
           python -m pip install requests
           python -m pip install fsbot
 
-      - name: get previous commit SHA from tag
-        id: get_prev
+      - name: Get last workflow_dispatch commit on main
+        id: last_dispatch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch --tags
-          prev_commit=$(git rev-list -n 1 last-prod-deploy || echo "")
-          echo "PREV_COMMIT_SHA=$prev_commit" >> $GITHUB_ENV
+          echo "当前 commit: ${{ github.sha }}"
+          previous_sha=$(gh api \
+            repos/${{ github.repository }}/actions/workflows/deploy.yml/runs \
+            --paginate \
+            -q '.workflow_runs[] | select(.event == "workflow_dispatch" and .status == "completed" and .conclusion == "success" and .head_branch == "main") | .head_sha' \
+            | grep -v "${{ github.sha }}" \
+            | head -n 1)
 
-      - name: get current commit SHA
-        id: get_curr
-        run: |
-          echo "CURRENT_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREV_COMMIT_SHA=$previous_sha" >> $GITHUB_ENV
+          echo "Last deploy SHA: $previous_sha"
 
-      - name: get commit diff
-        id: diff
+      - name: Get commit log since last deploy
+        id: gitlog
         run: |
           if [ -n "$PREV_COMMIT_SHA" ]; then
-            echo "Getting commits between $PREV_COMMIT_SHA and $CURRENT_COMMIT_SHA"
-            git log --pretty=format:"- %s (%an)" $PREV_COMMIT_SHA..$CURRENT_COMMIT_SHA > commit_diff.txt
+            echo "Commits since last deploy:"
+            git log --pretty=format:"- %s (%an)" $PREV_COMMIT_SHA..${{ github.sha }} > commit_diff.txt
           else
-            echo "First deployment or tag missing." > commit_diff.txt
+            echo "No previous manual deploy found. Showing all commits." > commit_diff.txt
+            git log --pretty=format:"- %s (%an)" > commit_diff.txt
           fi
 
       - name: set commit info
