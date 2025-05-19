@@ -29,12 +29,14 @@ pr_color_dict = {
     "reviewed": "blue",
     "merged": "green",
     "push": "red",
+    "release": "green",
 }
 pr_event_dict = {
     "created": "KUSE-Backend (kuse_ai) Pull Request 👀 ",
     "reviewed": "KUSE-Backend (kuse_ai) Request Approved ✅ ",
     "merged": "KUSE-Backend (kuse_ai) Pull Request Merged 👏 ",
     "push": "KUSE-Backend (kuse_ai) Main Pushed 🚀 ",
+    "release": "KUSE-Backend (kuse_ai) Release ",
 }
 
 

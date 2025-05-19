@@ -47,10 +47,8 @@ jobs:
 
       - name: set commit info
         run: |
-          echo pr_title="deploy to prod" >> $GITHUB_ENV
-          echo pr_url="url" >> $GITHUB_ENV
           echo pr_user=${{ github.actor }} >> $GITHUB_ENV
-          echo pr_type="push" >> $GITHUB_ENV
+          echo pr_type="release" >> $GITHUB_ENV
 
       - name: call lark webhook
         run: |
